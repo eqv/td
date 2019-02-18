@@ -26,7 +26,13 @@ impl CardDeck {
             CardType::Buff(BuffType::RPM),
             CardType::Buff(BuffType::Aura),
         ];
-        let actions = vec![CardType::NextWave, CardType::Tower, CardType::Shop];
+        let actions = vec![
+            CardType::NextWave,
+            CardType::Tower,
+            CardType::Shop,
+            CardType::DrawPile,
+            CardType::DiscardPile,
+        ];
         let discard = vec![];
         Self {
             hand,
@@ -40,7 +46,13 @@ impl CardDeck {
         let hand = vec![];
         let deck = vec![];
         let discard = vec![];
-        let actions = vec![CardType::NextWave, CardType::Tower, CardType::Shop];
+        let actions = vec![
+            CardType::NextWave,
+            CardType::Tower,
+            CardType::Shop,
+            CardType::DrawPile,
+            CardType::DiscardPile,
+        ];
         Self {
             hand,
             deck,

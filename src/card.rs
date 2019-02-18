@@ -2,6 +2,7 @@ use crate::assets::ImgID;
 use crate::buffs::BuffType;
 use crate::gui::CursorMode;
 use crate::map::GameMap;
+use crate::pile_overlay::PileOverlay;
 use crate::playing_state::PlayingState;
 use crate::shop_overlay::ShopOverlay;
 use crate::tower::Tower;
@@ -18,6 +19,8 @@ pub enum CardType {
     Take2,
     Buff(BuffType),
     NextWave,
+    DrawPile,
+    DiscardPile,
 }
 
 impl CardType {
@@ -36,6 +39,8 @@ impl CardType {
             CardType::Buff(BuffType::Damage) => ImgID::Damage,
             CardType::Buff(BuffType::Aura) => ImgID::Aura,
             CardType::NextWave => ImgID::NextWave,
+            CardType::DrawPile => ImgID::DrawPile,
+            CardType::DiscardPile => ImgID::DiscardPile,
         }
     }
 
@@ -61,6 +66,8 @@ impl CardType {
             CardType::Buff(BuffType::RPM) => "Increases rpm",
             CardType::Buff(BuffType::Aura) => "Increases stats of nearby towers",
             CardType::NextWave => "Immediatly starts next wave",
+            CardType::DrawPile => "Look at your draw pile",
+            CardType::DiscardPile => "Look at you discard pile",
         }
     }
 
@@ -82,6 +89,8 @@ impl CardType {
             CardType::Buff(BuffType::Range) => 10,
             CardType::Buff(BuffType::Aura) => 10,
             CardType::NextWave => 0,
+            CardType::DrawPile => 0,
+            CardType::DiscardPile => 0,
         }
     }
 
@@ -103,6 +112,8 @@ impl CardType {
             CardType::Buff(BuffType::RPM) => 100,
             CardType::Buff(BuffType::Range) => 100,
             CardType::Buff(BuffType::Aura) => 300,
+            CardType::DrawPile => 0,
+            CardType::DiscardPile => 0,
         }
     }
 
@@ -112,7 +123,13 @@ impl CardType {
             CardType::Tower => state.gui.set_cursor_card_effect(slot, self),
             CardType::SellTower => state.gui.set_cursor_card_effect(slot, self),
             CardType::DamageEnemy => state.gui.set_cursor_card_effect(slot, self),
-            CardType::Shop => state.overlay_state = Some(Box::new(ShopOverlay::new(slot))),
+            CardType::Shop => state.overlay_state = Some(Box::new(ShopOverlay::new())),
+            CardType::DiscardPile => {
+                state.overlay_state = Some(Box::new(PileOverlay::new(CardType::DiscardPile)))
+            }
+            CardType::DrawPile => {
+                state.overlay_state = Some(Box::new(PileOverlay::new(CardType::DrawPile)))
+            }
             CardType::Coin(a) => {
                 state.player_mut().gold += (10 as usize).pow(*a as u32);
                 state.player_mut().deck.card_used(slot);
@@ -163,6 +180,8 @@ impl CardType {
                 return state.towers.has_building(x, y)
                     && state.towers.get_tower(x, y).unwrap().can_have_buff(b);
             }
+            CardType::DrawPile => return false,
+            CardType::DiscardPile => return false,
         }
     }
 
@@ -187,6 +206,8 @@ impl CardType {
                 state.gui.set_cursor(CursorMode::Actions(0));
             }
             CardType::Shop => {}
+            CardType::DrawPile => {}
+            CardType::DiscardPile => {}
             CardType::Coin(_) => {}
             CardType::Take2 => {}
             CardType::NextWave => {}

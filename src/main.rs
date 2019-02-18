@@ -32,6 +32,7 @@ mod gui;
 mod map;
 mod menu_state;
 mod overlay_state;
+mod pile_overlay;
 mod player;
 mod playing_state;
 mod projectiles;
