@@ -1,5 +1,6 @@
 use crate::algebra::{Point, Vector};
 use crate::assets::ImgID;
+extern crate rand;
 use crate::buffs::BuffType;
 use crate::card::CardType;
 use crate::event_handler::StateTransition;
@@ -9,34 +10,21 @@ use crate::utils::{self, add_mod};
 use ggez::event::{KeyCode, KeyMods};
 use ggez::graphics::{self, Color};
 use ggez::{Context, GameResult};
+use rand::{thread_rng, Rng};
 
 pub struct PileOverlay {
-    kind: CardType,
     cur_selected: usize,
+    cards: Vec<CardType>,
 }
 
 impl PileOverlay {
-    pub fn new(kind: CardType) -> Self {
+    pub fn new(cards: Vec<CardType>) -> Self {
+        let mut shuffled = cards.clone();
+        thread_rng().shuffle(&mut shuffled);
         return Self {
-            kind,
             cur_selected: 0,
+            cards: shuffled,
         };
-    }
-
-    fn get_cards(&self, state: &PlayingState) -> Vec<CardType> {
-        match self.kind {
-            CardType::DiscardPile => self.get_discard(state),
-            CardType::DrawPile => self.get_draw(state),
-            _ => unreachable!(),
-        }
-    }
-
-    fn get_draw(&self, state: &PlayingState) -> Vec<CardType> {
-        return state.player().deck.deck.clone();
-    }
-
-    fn get_discard(&self, state: &PlayingState) -> Vec<CardType> {
-        return state.player().deck.discard.clone();
     }
 
     fn get_drawing_offset(&self) -> f32 {
@@ -47,7 +35,7 @@ impl PileOverlay {
     }
 
     fn draw_cards(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
-        for (i, card) in self.get_cards(state).iter().enumerate() {
+        for (i, card) in self.cards.iter().enumerate() {
             graphics::draw(
                 ctx,
                 state.data.as_ref().unwrap().get_i(&ImgID::Card),
@@ -90,7 +78,7 @@ impl PileOverlay {
     }
 
     fn draw_cursor(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
-        if self.get_cards(state).get(self.cur_selected).is_none() {
+        if self.cards.get(self.cur_selected).is_none() {
             return Ok(());
         }
         graphics::draw(
@@ -108,10 +96,7 @@ impl PileOverlay {
     }
 
     fn draw_selected(&self, state: &PlayingState, ctx: &mut Context) -> GameResult<()> {
-        let card = self
-            .get_cards(state)
-            .get(self.cur_selected)
-            .unwrap_or(return Ok(()));
+        let card = self.cards.get(self.cur_selected).unwrap_or(return Ok(()));
         graphics::draw(
             ctx,
             state.data.as_ref().unwrap().get_i(&card.get_image_id()),
@@ -157,13 +142,13 @@ impl OverlayState for PileOverlay {
     ) -> StateTransition {
         match keycode {
             KeyCode::Up => {
-                if self.get_cards(state).len() > 0 {
-                    self.cur_selected = add_mod(self.cur_selected, -1, self.get_cards(state).len())
+                if self.cards.len() > 0 {
+                    self.cur_selected = add_mod(self.cur_selected, -1, self.cards.len())
                 }
             }
             KeyCode::Down => {
-                if self.get_cards(state).len() > 0 {
-                    self.cur_selected = add_mod(self.cur_selected, 1, self.get_cards(state).len())
+                if self.cards.len() > 0 {
+                    self.cur_selected = add_mod(self.cur_selected, 1, self.cards.len())
                 }
             }
             KeyCode::Escape => {

@@ -125,10 +125,13 @@ impl CardType {
             CardType::DamageEnemy => state.gui.set_cursor_card_effect(slot, self),
             CardType::Shop => state.overlay_state = Some(Box::new(ShopOverlay::new())),
             CardType::DiscardPile => {
-                state.overlay_state = Some(Box::new(PileOverlay::new(CardType::DiscardPile)))
+                state.overlay_state = Some(Box::new(PileOverlay::new(
+                    state.player().deck.discard.clone(),
+                )))
             }
             CardType::DrawPile => {
-                state.overlay_state = Some(Box::new(PileOverlay::new(CardType::DrawPile)))
+                state.overlay_state =
+                    Some(Box::new(PileOverlay::new(state.player().deck.deck.clone())))
             }
             CardType::Coin(a) => {
                 state.player_mut().gold += (10 as usize).pow(*a as u32);
