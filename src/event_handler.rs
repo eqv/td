@@ -45,7 +45,7 @@ impl event::EventHandler for GameEventHandler {
             StateTransition::Return => unreachable!(),
             StateTransition::Next(state) => self.use_state(state),
             StateTransition::Exit => {
-                ggez::quit(ctx);
+                ggez::event::quit(ctx);
             }
         }
 
@@ -69,7 +69,7 @@ impl event::EventHandler for GameEventHandler {
             StateTransition::Return => unreachable!(),
             StateTransition::Next(state) => self.use_state(state),
             StateTransition::Exit => {
-                ggez::quit(ctx);
+                ggez::event::quit(ctx);
             }
         }
     }

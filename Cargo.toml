@@ -5,8 +5,8 @@ authors = ["coco <coco@hexgolems.com>", "leex <leex+td@klautcomputing.de>"]
 edition = "2018"
 
 [dependencies]
-ggez = "0.5.0-rc.0"
-nalgebra = "0.16.13"
+ggez = "*"
+nalgebra = "*"
 rand = "0.6"
 ron = "*"
 serde = "*"
